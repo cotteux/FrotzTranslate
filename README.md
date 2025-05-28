@@ -1,3 +1,5 @@
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/TigreGotico/pyFrotz)
+
 # PyFrotz
 
 **PyFrotz** is a minimal Python wrapper around [Frotz](https://gitlab.com/DavidGriffith/frotz), a popular interpreter for Infocom's text adventure games. It complies with the Z-Machine Standard version 1.1, making it compatible with classic interactive fiction.
