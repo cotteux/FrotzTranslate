@@ -1,0 +1,52 @@
+w:o
+e:e
+n:n
+s:s
+se:se
+ne:ne
+sw:so
+nw:no
+north:nord
+south:sud
+east:est
+west:ouest
+northeast:nord est
+northwest:nord ouest
+southeast:sud est
+southwest:sud ouest
+northeast:nordest
+northwest:nordouest
+southeast:sudest
+southwest:sudouest
+up:monter
+down:descendre
+look:regarde
+look:regarder
+save:save
+restore:restore
+restart:restart
+verbose:verbaliser
+score:points
+diagnose:diagnose
+brief:brief
+superbrief:superbrief
+quit:quit
+climb:grimper
+go:aller
+enter:entrer
+in:interieur
+out:exterieur
+hi:bonjour
+hello:allo
+throw:lancer
+open:ouvrir
+read:lire
+drop:laisser
+put:mettre
+turn:tourner
+move:deplacer
+attack:attaquer
+examine:examiner
+inventory:inventaire
+take all:prendre tout
+take all:tout prendre
