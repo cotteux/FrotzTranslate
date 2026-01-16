@@ -1,8 +1,12 @@
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/TigreGotico/pyFrotz)
 
-# PyFrotz
+# Frotz-Translate
 
-**PyFrotz** is a minimal Python wrapper around [Frotz](https://gitlab.com/DavidGriffith/frotz), a popular interpreter for Infocom's text adventure games. It complies with the Z-Machine Standard version 1.1, making it compatible with classic interactive fiction.
+**Frotz-Translate** is a minimal Python wrapper around [Frotz](https://gitlab.com/DavidGriffith/frotz), a popular interpreter for Infocom's text adventure games. It complies with the Z-Machine Standard version 1.1, making it compatible with classic interactive fiction.
+
+This also translate commands and description in french but adaptable to any language
+
+**THIS IS A PROTOTYPE FOR THE MOMENT, A LOTS OF BUGS**
 
  <img src='./pyfrotz/gui/all/pyfrotz.png' card_color='#00ff00' width='150' height='150' style='vertical-align:bottom'/> 
 
@@ -13,12 +17,6 @@ Source code for a lot of infocom games can be found [@historicalsource](https://
 ---
 
 ## Installation
-
-First, install the PyFrotz Python package via pip:
-
-```bash
-pip install pyfrotz
-```
 
 Additionally, ensure you have [dfrotz](https://gitlab.com/DavidGriffith/frotz.git) installed on your system. It is often packaged as `frotz-dumb` in Linux distributions.
 
