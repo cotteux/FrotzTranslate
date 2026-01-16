@@ -3,21 +3,27 @@ import threading
 import time
 from distutils.spawn import find_executable
 from os.path import exists
+from googletrans import Translator
+
 
 from pyfrotz.parsers import default_intro_parser, default_room_parser
-
+with open('frcommands', 'r') as file:
+    data = file.read().splitlines()
+    #print (data[1].split(':'))
+    #autre = data[1].split(':')
+    #print(autre[1])
 
 class Frotz:
     def __init__(self, game_data,
                  interpreter=None,
-                 save_file='save.qzl',
+                 save_file="allo.qzl",
                  prompt_symbol=">",
                  intro_parser=None,
                  room_parser=None):
         self.data = game_data
         self.interpreter = (interpreter or
                             find_executable("dfrotz") or
-                            "/usr/bin/dfrotz")
+                            "/usr/games/dfrotz")
         self.save_file = save_file
         self.prompt_symbol = prompt_symbol
         self.intro = None
@@ -28,14 +34,14 @@ class Frotz:
 
     def _get_frotz(self):
 
-        self.frotz = subprocess.Popen([self.interpreter, self.data],
+        self.frotz = subprocess.Popen([self.interpreter,self.data],
                                       stdin=subprocess.PIPE,
                                       stdout=subprocess.PIPE)
         time.sleep(0.1)  # Allow to load
 
         # Load default savegame
         if exists(self.save_file):
-            print('Loading saved game')
+            #print('Loading saved game')
             self.restore(self.save_file)
 
     def save(self, filename=None):
@@ -43,22 +49,24 @@ class Frotz:
             Save game state.
         """
         filename = filename or self.save_file
+        self.save_file = filename
         self.do_command('save')
         time.sleep(0.5)
-        self._clear_until_prompt(':')
+        #self._clear_until_prompt(':')
         self.do_command(filename)  # Accept default savegame
         time.sleep(0.5)
         # Check if game returns Ok or query to overwrite
-        while True:
-            char = self.frotz.stdout.read(1)
-            time.sleep(0.01)
-            if char == b'.':  # Ok. (everything is done)
-                break  # The save is complete
-            if char == b'?':  # Indicates an overwrite query
-                self.do_command('y')  # reply yes
+        self.do_command('y')  # reply yes
+        #while True:
+        #    char = self.frotz.stdout.read(1)
+        #    time.sleep(0.01)
+        #    if char == b'.':  # Ok. (everything is done)
+        #        break  # The save is complete
+        #    if char == b'?':  # Indicates an overwrite query
+        #        self.do_command('y')  # reply yes
 
         time.sleep(0.5)
-        self._clear_until_prompt()
+        #self._clear_until_prompt()
 
     def restore(self, filename=None):
         """
@@ -67,10 +75,10 @@ class Frotz:
         filename = filename or self.save_file
         self.do_command('restore')
         time.sleep(0.5)
-        self._clear_until_prompt(':')
+        #self._clear_until_prompt(':')
         self.do_command(filename)  # Accept default savegame
         time.sleep(0.5)
-        self._clear_until_prompt()
+        #self._clear_until_prompt()
 
     def _clear_until_prompt(self, prompt=None):
         """ Clear all received characters until the standard prompt. """
@@ -89,24 +97,61 @@ class Frotz:
                 time.sleep(0.001)
                 char += self.frotz.stdout.read(1).decode()
 
+    def do_tcommand(self, action):
+
+        tosend='' 
+        # translate the right command
+                
+        for i in data :
+            command = i.split(':')
+            #print(command)
+            if action == command[1] :
+
+                tosend = command[0]
+                print(tosend)
+                break;
+            
+
+                
+        if tosend == '' and action != '':            
+            translator = Translator()
+            translation = translator.translate(action,dest='en')
+            tosend = translation.text
+            print ('----'+tosend)
+
+
+
+            """ Write a command to the interpreter. """
+            self.frotz.stdin.write(tosend.encode() + b'\n')
+            self.frotz.stdin.flush()
+            return self._frotz_read()
+        else :
+            return
+
     def do_command(self, action):
         """ Write a command to the interpreter. """
         self.frotz.stdin.write(action.encode() + b'\n')
         self.frotz.stdin.flush()
         return self._frotz_read()
 
+
     def _frotz_read(self, prompt_symbol=None):
         """
         Read from frotz interpreter process.
         Returns current scene description.
         """
+        
         prompt_symbol = prompt_symbol or self.prompt_symbol
         # Read info
         output = self.frotz.stdout.read(1).decode()
-        while output[-1] not in [prompt_symbol, "?"]:
+        while output[-1] not in [prompt_symbol,"?"]:
             if self.game_ended():
                 return output + "\nGAME OVER"
             output += self.frotz.stdout.read(1).decode()
+            
+            if  self.save_file in output :
+                #print ("POUET")
+                return output
 
         # remove prompt symbol
         if output.endswith(prompt_symbol):
@@ -115,8 +160,12 @@ class Frotz:
         # extract room info
         if self.room_parser:
             self.room, output = self.room_parser(output)
-
-        return output.strip()
+        # translate the text 
+        if output !='' :
+            translator = Translator()
+            translation = translator.translate(output,dest='fr')
+        
+        return translation.text.strip()
 
     def parse_intro(self):
         if self.intro_parser:
@@ -135,7 +184,7 @@ class Frotz:
         try:
             while not self.game_ended():
                 cmd = input(">>").strip()
-                descript = self.do_command(cmd).strip()
+                descript = self.do_tcommand(cmd).strip()
                 if not descript and cmd != "look":
                     # some games dont give output sometimes (eg, Advent)
                     try:
@@ -216,3 +265,4 @@ class EventFrotz(threading.Thread):
 
         if self.on_game_ended is not None:
             self.on_game_ended()
+
