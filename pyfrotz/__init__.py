@@ -3,7 +3,7 @@ import threading
 import time
 from distutils.spawn import find_executable
 from os.path import exists
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 
 
 from pyfrotz.parsers import default_intro_parser, default_room_parser
@@ -105,7 +105,7 @@ class Frotz:
         for i in data :
             command = i.split(':')
             #print(command)
-            if action == command[1] :
+            if action.strip() == command[1] :
 
                 tosend = command[0]
                 print(tosend)
@@ -114,19 +114,18 @@ class Frotz:
 
                 
         if tosend == '' and action != '':            
-            translator = Translator()
-            translation = translator.translate(action,dest='en')
-            tosend = translation.text
+            #translator = Translator()
+            #translation = translator.translate(action,dest='en')
+            translation = GoogleTranslator(source='fr', target='en').translate(action)
+            tosend = translation
             print ('----'+tosend)
 
 
 
-            """ Write a command to the interpreter. """
-            self.frotz.stdin.write(tosend.encode() + b'\n')
-            self.frotz.stdin.flush()
-            return self._frotz_read()
-        else :
-            return
+        """ Write a command to the interpreter. """
+        self.frotz.stdin.write(tosend.encode() + b'\n')
+        self.frotz.stdin.flush()
+        return self._frotz_tread()
 
     def do_command(self, action):
         """ Write a command to the interpreter. """
@@ -160,12 +159,66 @@ class Frotz:
         # extract room info
         if self.room_parser:
             self.room, output = self.room_parser(output)
+
+        return output.strip()
+
+    def _frotz_tread(self, prompt_symbol=None):
+        """
+        Read from frotz interpreter process.
+        Returns current scene description.
+        """
+        
+        prompt_symbol = prompt_symbol or self.prompt_symbol
+        # Read info
+        output = self.frotz.stdout.read(1).decode()
+        while output[-1] not in [prompt_symbol,"?"]:
+            if self.game_ended():
+                return output + "\nGAME OVER"
+            output += self.frotz.stdout.read(1).decode()
+            
+            if  self.save_file in output :
+                #print ("POUET")
+                return output
+
+        # remove prompt symbol
+        if output.endswith(prompt_symbol):
+            output = output[:-1]
+
+        # extract room info
+        if self.room_parser:
+            self.room, output = self.room_parser(output)
+
         # translate the text 
         if output !='' :
-            translator = Translator()
-            translation = translator.translate(output,dest='fr')
-        
-        return translation.text.strip()
+            #translator = Translator()
+            #translation = translator.translate(output,dest='fr')
+            output1 = ''
+            if  'You are carrying:' not in output :
+                position = 0
+                
+                position = output.find("\n\n")
+               
+                output1 = output[:position]+"\n\n"            
+                output = output[position+2:]
+                         
+                position = output.find("\n")
+              
+                output2 = output[:position]            
+                output = output[position+1:]
+    #        
+
+
+                output = output.replace("\n"," ")
+                output = output.replace(".",".\n")
+               
+                output = output2+"\n" + output
+            translation = GoogleTranslator(source='en', target='fr').translate(output)
+            output = output1+ translation
+            #print(translation.strip())
+            #return translation.strip()
+        return output.strip()
+  
+
 
     def parse_intro(self):
         if self.intro_parser:
@@ -180,7 +233,8 @@ class Frotz:
     def play_loop(self):
         # just for testing in cli
         self.parse_intro()
-        print(self.intro)
+        translation = GoogleTranslator(source='en', target='fr').translate(self.intro)
+        print(translation)
         try:
             while not self.game_ended():
                 cmd = input(">>").strip()

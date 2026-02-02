@@ -50,3 +50,8 @@ examine:examiner
 inventory:inventaire
 take all:prendre tout
 take all:tout prendre
+open trap:ouvrir la trappe
+open trap:ouvrir trappe
+take coins:prendre pieces de monnaie
+take coins:prendre les pieces de monnaie
+take painting:prendre la peinture
