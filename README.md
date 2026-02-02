@@ -25,7 +25,7 @@ Additionally, ensure you have [dfrotz](https://gitlab.com/DavidGriffith/frotz.gi
 
 PyFrotz can be used programmatically or interactively in the command line interface (CLI).
 ```
-pip install googletrans
+pip install -r requirement.txt
 ```
 
 ### Programmatic Usage
